@@ -31,3 +31,12 @@ Usage: ./pfft.rb
 "--changelog",  "-c"  Output file
 "--output",     "-o"  Output file
 ```
+
+Example
+-------
+
+Fix input.pdf
+
+```
+$ ./pfft.rb --input=input.pdf --output=output.pdf
+```
