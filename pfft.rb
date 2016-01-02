@@ -35,9 +35,9 @@ work_dir  = "/tmp/"+File.basename(script,".rb")
 # Check we have poppler installed
 
 if !pdf_split.match(/pdfseparate/)
-	puts "Poppler tools not installed"
-	puts "If you have brew installed, run 'brew install poppler'"
-	exit
+  puts "Poppler tools not installed"
+  puts "If you have brew installed, run 'brew install poppler'"
+  exit
 end
 
 # Get version
@@ -60,7 +60,7 @@ end
 # Print uasage
 
 def print_usage(script)
-	switches     = []
+  switches     = []
   long_switch  = ""
   short_switch = ""
   help_info    = ""
@@ -83,7 +83,7 @@ def print_usage(script)
     end
   end
   puts
-	return
+  return
 end
 
 def print_changelog()
@@ -121,128 +121,128 @@ end
 
 begin
   option = Getopt::Long.getopts(
-  	[ "--input",   	 "-i", Getopt::REQUIRED ], # Input file
-  	[ "--verbose", 	 "-v", Getopt::BOOLEAN ],  # Verbose mode
-  	[ "--version", 	 "-V", Getopt::BOOLEAN ],  # Print version
-  	[ "--help",    	 "-h", Getopt::BOOLEAN ],  # Print usage
-  	[ "--changelog", "-c", Getopt::REQUIRED ], # Output file
-  	[ "--output",    "-o", Getopt::REQUIRED ]  # Output file
+    [ "--input",     "-i", Getopt::REQUIRED ], # Input file
+    [ "--verbose",   "-v", Getopt::BOOLEAN ],  # Verbose mode
+    [ "--version",   "-V", Getopt::BOOLEAN ],  # Print version
+    [ "--help",      "-h", Getopt::BOOLEAN ],  # Print usage
+    [ "--changelog", "-c", Getopt::REQUIRED ], # Output file
+    [ "--output",    "-o", Getopt::REQUIRED ]  # Output file
   )
 rescue
-	print_usage(script)
-	exit
+  print_usage(script)
+  exit
 end
 
 if option["version"]
-	print_version()
-	exit
+  print_version()
+  exit
 end
 
 if option["help"]
-	print_usage(script)
-	exit
+  print_usage(script)
+  exit
 end
 
 if option["verbose"]
-	verbose_mode = 1
+  verbose_mode = 1
 else
-	verbose_mode = 0
+  verbose_mode = 0
 end
 
 if !Dir.exist?(work_dir)
-	Dir.mkdir(work_dir)
+  Dir.mkdir(work_dir)
 else
-	if verbose_mode == 1
-		puts "Cleaning up work directory "+work_dir
-	end
-	file_names = Dir.entries(work_dir)
-	if file_names.to_s.match(/[0-9]/)
-		%x[cd "#{work_dir}" ; rm *]
-	end
+  if verbose_mode == 1
+    puts "Cleaning up work directory "+work_dir
+  end
+  file_names = Dir.entries(work_dir)
+  if file_names.to_s.match(/[0-9]/)
+    %x[cd "#{work_dir}" ; rm *]
+  end
 end
 
 def join_pdfs(work_dir,output_file,pdf_join,verbose_mode)
-	pdf_files  = Dir.entries(work_dir).grep(/\.pdf$/)
-	no_files   = pdf_files.length
-	work_files = []
-	for count in 1..no_files
-		file_name = count.to_s+".pdf"
-		work_files.push(file_name)
-	end
-	work_files = work_files.join(" ")
-	command_line = "cd \"#{work_dir}\" ; \"#{pdf_join}\" #{work_files} \"#{output_file}\""
-	if verbose_mode == 1
-		puts "Executing: "+command_line
-	end
-	%x[#{command_line}]
-	return
+  pdf_files  = Dir.entries(work_dir).grep(/\.pdf$/)
+  no_files   = pdf_files.length
+  work_files = []
+  for count in 1..no_files
+    file_name = count.to_s+".pdf"
+    work_files.push(file_name)
+  end
+  work_files = work_files.join(" ")
+  command_line = "cd \"#{work_dir}\" ; \"#{pdf_join}\" #{work_files} \"#{output_file}\""
+  if verbose_mode == 1
+    puts "Executing: "+command_line
+  end
+  %x[#{command_line}]
+  return
 end
 
 def split_pdf(work_dir,input_file,pdf_split,verbose_mode)
-	command_line = "cd \"#{work_dir}\" ; \"#{pdf_split}\" \"#{input_file}\" %d.pdf"
-	if verbose_mode == 1
-		puts "Executing: "+command_line
-	end
-	%x[#{command_line}]
-	return
+  command_line = "cd \"#{work_dir}\" ; \"#{pdf_split}\" \"#{input_file}\" %d.pdf"
+  if verbose_mode == 1
+    puts "Executing: "+command_line
+  end
+  %x[#{command_line}]
+  return
 end
 
 if option["input"]
-	input_file = option["input"]
-	if input_file.match(/^\~/)
-		home_dir   = ENV["HOME"]
-		input_file = input_file.gsub(/\~/,home_dir)
-	end
-	if !File.exist?(input_file)
-		puts "Input file \""+input_file+"\" does not exist"
-		exit
-	end
-	if input_file.match(/\//)
-		if input_file.match(/^\./)
-			input_dir = Dir.pwd
-		else
-			input_dir = File.dirname(input_file)
-		end
-	else
-			input_dir = Dir.pwd
-	end
+  input_file = option["input"]
+  if input_file.match(/^\~/)
+    home_dir   = ENV["HOME"]
+    input_file = input_file.gsub(/\~/,home_dir)
+  end
+  if !File.exist?(input_file)
+    puts "Input file \""+input_file+"\" does not exist"
+    exit
+  end
+  if input_file.match(/\//)
+    if input_file.match(/^\./)
+      input_dir = Dir.pwd
+    else
+      input_dir = File.dirname(input_file)
+    end
+  else
+      input_dir = Dir.pwd
+  end
 else
-	puts "No input file specified"
-	exit
+  puts "No input file specified"
+  exit
 end
 
 if option["output"]
-	output_file = option["output"]
-	if output_file.match(/^\~/)
-		home_dir    = ENV["HOME"]
-		output_file = output_file.gsub(/\~/,home_dir)
-	end
-	if output_file.match(/\//)
-		output_dir = File.dirname(output_file)
-		if !File.directory?(output_dir) and !File.symlink?(output_dir)
-			puts "Output directory "+output_dir+" does not exist"
-			exit
-		end
-	end
-	output_file = output_file.gsub(/\.pdf$|\.PDF$/,"")
+  output_file = option["output"]
+  if output_file.match(/^\~/)
+    home_dir    = ENV["HOME"]
+    output_file = output_file.gsub(/\~/,home_dir)
+  end
+  if output_file.match(/\//)
+    output_dir = File.dirname(output_file)
+    if !File.directory?(output_dir) and !File.symlink?(output_dir)
+      puts "Output directory "+output_dir+" does not exist"
+      exit
+    end
+  end
+  output_file = output_file.gsub(/\.pdf$|\.PDF$/,"")
 else
-	output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
-	output_file = output_file+"_fixed.pdf"
-	if verbose_mode == 1
-		puts "Setting output file name to "+output_file
-	end
+  output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
+  output_file = output_file+"_fixed.pdf"
+  if verbose_mode == 1
+    puts "Setting output file name to "+output_file
+  end
 end
 
 if input_file == output_file
-	output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
-	output_file = output_file+"_fixed.pdf"
-	if verbose_mode == 1
-		puts "Setting output file name to "+output_file
-	end
+  output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
+  output_file = output_file+"_fixed.pdf"
+  if verbose_mode == 1
+    puts "Setting output file name to "+output_file
+  end
 else
-	if !output_file.match(/\.pdf$|\.PDF$/)
-		output_file = output_file+".pdf"
-	end
+  if !output_file.match(/\.pdf$|\.PDF$/)
+    output_file = output_file+".pdf"
+  end
 end
 
 split_pdf(work_dir,input_file,pdf_split,verbose_mode)
