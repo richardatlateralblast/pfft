@@ -3,3 +3,5 @@
 # Initial version
 # 0.0.2: Sat  2 Jan 2016 13:27:15 AEDT
 # Fixes and improvements
+# 0.0.3: Sat  2 Jan 2016 17:55:42 AEDT
+# Use Ghostscript to recompress PDF

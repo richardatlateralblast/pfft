@@ -3,7 +3,7 @@
 #!/usr/bin/env ruby
 
 # Name:         pfft (PDF File Fixing Tool)
-# Version:      0.0.2
+# Version:      0.0.3
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -31,11 +31,20 @@ script    = $0
 pdf_split = %x[which pdfseparate].chomp
 pdf_join  = %x[which pdfunite].chomp
 work_dir  = "/tmp/"+File.basename(script,".rb")
+gs_bin    = %x[which gs].chomp
 
-# Check we have poppler installed
+# Check we have Poppler installed
 
 if !pdf_split.match(/pdfseparate/)
   puts "Poppler tools not installed"
+  puts "If you have brew installed, run 'brew install ghostscript'"
+  exit
+end
+
+# Check we have Ghostscript installed
+
+if !gs_bin.match(/gs/)
+  puts "Ghostscript not installed"
   puts "If you have brew installed, run 'brew install poppler'"
   exit
 end
@@ -161,8 +170,9 @@ else
   end
 end
 
-def join_pdfs(work_dir,output_file,pdf_join,verbose_mode)
+def join_pdfs(work_dir,output_file,pdf_join,verbose_mode,gs_bin)
   pdf_files  = Dir.entries(work_dir).grep(/\.pdf$/)
+  temp_file  = work_dir+"/temp.pdf"
   no_files   = pdf_files.length
   work_files = []
   for count in 1..no_files
@@ -170,7 +180,12 @@ def join_pdfs(work_dir,output_file,pdf_join,verbose_mode)
     work_files.push(file_name)
   end
   work_files = work_files.join(" ")
-  command_line = "cd \"#{work_dir}\" ; \"#{pdf_join}\" #{work_files} \"#{output_file}\""
+  command_line = "cd \"#{work_dir}\" ; \"#{pdf_join}\" #{work_files} \"#{temp_file}\""
+  if verbose_mode == 1
+    puts "Executing: "+command_line
+  end
+  %x[#{command_line}]
+  command_line = "cd \"#{work_dir}\" ; \"#{gs_bin}\" -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -sOutputFile=\"#{output_file}\" \"#{temp_file}\""
   if verbose_mode == 1
     puts "Executing: "+command_line
   end
@@ -178,7 +193,7 @@ def join_pdfs(work_dir,output_file,pdf_join,verbose_mode)
   return
 end
 
-def split_pdf(work_dir,input_file,pdf_split,verbose_mode)
+def split_pdf(work_dir,input_file,pdf_split,verbose_mode,gs_bin)
   command_line = "cd \"#{work_dir}\" ; \"#{pdf_split}\" \"#{input_file}\" %d.pdf"
   if verbose_mode == 1
     puts "Executing: "+command_line
@@ -245,5 +260,5 @@ else
   end
 end
 
-split_pdf(work_dir,input_file,pdf_split,verbose_mode)
-join_pdfs(work_dir,output_file,pdf_join,verbose_mode)
+split_pdf(work_dir,input_file,pdf_split,verbose_mode,gs_bin)
+join_pdfs(work_dir,output_file,pdf_join,verbose_mode,gs_bin)

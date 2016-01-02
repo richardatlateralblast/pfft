@@ -16,6 +16,19 @@ This software is licensed as CC-BA (Creative Commons By Attrbution)
 
 http://creativecommons.org/licenses/by/4.0/legalcode
 
+Requirements
+------------
+
+Ruby:
+
+- rubygems
+- getopt/long
+
+Tools:
+
+- poppler
+- ghostscript
+
 Usage
 -----
 
