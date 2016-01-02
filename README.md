@@ -19,7 +19,7 @@ http://creativecommons.org/licenses/by/4.0/legalcode
 Usage
 -----
 
-``
+```
 $ ./pfft.rb --help
 
 Usage: ./pfft.rb
@@ -30,4 +30,4 @@ Usage: ./pfft.rb
 "--help",       "-h"  Print usage
 "--changelog",  "-c"  Output file
 "--output",     "-o"  Output file
-``
+```
