@@ -40,3 +40,9 @@ Fix input.pdf
 ```
 $ ./pfft.rb --input=input.pdf --output=output.pdf
 ```
+
+Fix input.pdf
+
+```
+$ ./pfft.rb --input=input.pdf
+```

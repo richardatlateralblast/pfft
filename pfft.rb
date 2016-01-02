@@ -3,7 +3,7 @@
 #!/usr/bin/env ruby
 
 # Name:         pfft (PDF File Fixing Tool)
-# Version:      0.0.1
+# Version:      0.0.2
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -187,23 +187,12 @@ def split_pdf(work_dir,input_file,pdf_split,verbose_mode)
 	return
 end
 
-if option["output"]
-	output_file = option["output"]
-	if output_file.match(/\//)
-		output_dir = File.dirname(output_file)
-		if !File.directory?(output_dir) and !File.symlink?(output_dir)
-			puts "Output directory "+output_dir+" does not exist"
-			exit
-		end
-	end
-	output_file = output_file.gsub(/\.pdf|\.PDF/,"")
-else
-	puts "No output file specified"
-	exit
-end
-
 if option["input"]
 	input_file = option["input"]
+	if input_file.match(/^\~/)
+		home_dir   = ENV["HOME"]
+		input_file = input_file.gsub(/\~/,home_dir)
+	end
 	if !File.exist?(input_file)
 		puts "Input file \""+input_file+"\" does not exist"
 		exit
@@ -222,10 +211,38 @@ else
 	exit
 end
 
-if input_file == output_file
-	output_file = output_file+"_fixed.pdf"
+if option["output"]
+	output_file = option["output"]
+	if output_file.match(/^\~/)
+		home_dir    = ENV["HOME"]
+		output_file = output_file.gsub(/\~/,home_dir)
+	end
+	if output_file.match(/\//)
+		output_dir = File.dirname(output_file)
+		if !File.directory?(output_dir) and !File.symlink?(output_dir)
+			puts "Output directory "+output_dir+" does not exist"
+			exit
+		end
+	end
+	output_file = output_file.gsub(/\.pdf$|\.PDF$/,"")
 else
-	output_file = output_file+".pdf"
+	output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
+	output_file = output_file+"_fixed.pdf"
+	if verbose_mode == 1
+		puts "Setting output file name to "+output_file
+	end
+end
+
+if input_file == output_file
+	output_file = input_file.gsub(/\.pdf$|\.PDF$/,"")
+	output_file = output_file+"_fixed.pdf"
+	if verbose_mode == 1
+		puts "Setting output file name to "+output_file
+	end
+else
+	if !output_file.match(/\.pdf$|\.PDF$/)
+		output_file = output_file+".pdf"
+	end
 end
 
 split_pdf(work_dir,input_file,pdf_split,verbose_mode)
